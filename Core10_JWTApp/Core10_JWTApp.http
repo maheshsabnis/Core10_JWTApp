@@ -1,0 +1,6 @@
+@Core10_JWTApp_HostAddress = http://localhost:5003
+
+GET {{Core10_JWTApp_HostAddress}}/api/patients
+Accept: application/json
+
+###

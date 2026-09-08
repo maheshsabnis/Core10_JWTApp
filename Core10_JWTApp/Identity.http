@@ -1,0 +1,82 @@
+@host = https://localhost:7045
+@email = user001@myuser.test
+@password = P@ssw0rd_
+@accessToken = paste-access-token-here
+@refreshToken = paste-refresh-token-here
+@confirmationUrl = https://localhost:7045/auth/confirmEmail?userId=replace-me&code=replace-me
+
+### Register. Copy the confirmation URL from the Development application logs.
+POST {{host}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Before confirmation, login returns 401. After confirmation, it returns tokens.
+POST {{host}}/auth/login?useCookies=false
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Replace confirmationUrl with the complete URL from the Development logs.
+GET {{confirmationUrl}}
+
+### Resend a confirmation email.
+POST {{host}}/auth/resendConfirmationEmail
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### Read Identity's email/confirmation information.
+GET {{host}}/auth/manage/info
+Authorization: Bearer {{accessToken}}
+
+### Change email. Confirm the NEW email using the newly logged confirmation link.
+POST {{host}}/auth/manage/info
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "newEmail": "identity-demo-updated@example.test"
+}
+
+### Change password. Sign in again afterward to get a fresh token pair.
+POST {{host}}/auth/manage/info
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "oldPassword": "{{password}}",
+  "newPassword": "Development-Only!567"
+}
+
+### Refresh does not require an Authorization header. Replace BOTH saved tokens afterward.
+POST {{host}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Request a password reset. Copy the reset code from Development logs.
+POST {{host}}/auth/forgotPassword
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### Invalid refresh token must return 401.
+POST {{host}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid-token"
+}
